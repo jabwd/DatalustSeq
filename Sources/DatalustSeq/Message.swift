@@ -8,7 +8,7 @@
 import Foundation
 import Logging
 
-struct Message {
+struct Message: CustomStringConvertible {
     static let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -72,13 +72,30 @@ struct Message {
 	var line: UInt { box.line }
 	var message: String { box.message }
 
-    var levelMsg: String {
-        return level.rawValue
+    var clefMessage: [UInt8]? {
+        let encoder = JSONEncoder()
+        let msg: [String: String] = [
+            "@t": "\(Self.dateFormatter.string(from: Date()))",
+            "@l": "\(level.rawValue)",
+            "@mt": "\(message), {function}:{line} in {file}",
+            "function": function,
+            "line": "\(line)",
+            "file": file,
+        ]
+        guard let buff = try? encoder.encode(msg) else {
+            return nil
+        }
+        return Array(buff)
     }
 
-    var clefMessage: String {
-"""
-{"@t": "\(Self.dateFormatter.string(from: Date()))", "@l": "\(levelMsg)", "@mt": "\(message), {function}:{line} in {file}", "function": "\(function)", "line": "\(line)", "file": "\(file)"}
+    var description: String {
+        """
+SeqLogMessage {
+    level: \(level)
+    text: \(message)
+    function: \(function):\(line)
+    file: \(file)
+}
 """
     }
 }
