@@ -19,7 +19,9 @@ internal final class ClefFormatter {
 	}
 	
 	func format(message: Message) -> String {
-		return ""
+		return #"""
+{"@t":"2016-06-07T03:44:57.8532799Z","@mt":"{User}","User":"alice"}
+"""#
 	}
 }
 
