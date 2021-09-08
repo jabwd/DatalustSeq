@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct SeqConfiguration {
+public struct SeqConfiguration: Codable {
     let ingestURL: URL
     let key: String
 
