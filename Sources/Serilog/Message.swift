@@ -23,11 +23,13 @@ struct Message: CustomStringConvertible {
     let function: String
     let line: UInt
     let message: String
+    let label: String
     let metadata: [String: String]?
 
     init(
       level: Logger.Level,
       message: Logger.Message,
+      label: String,
       file: String,
       function: String,
       line: UInt,
@@ -36,6 +38,7 @@ struct Message: CustomStringConvertible {
       self.file = file
       self.function = function
       self.line = line
+      self.label = label
       self.message = message.description
       self.level = level
       self.metadata = metadata?.reduce([String: String]()) { (dict, value) -> [String: String] in
@@ -51,6 +54,7 @@ struct Message: CustomStringConvertible {
   init(
     level: Logger.Level,
     message: Logger.Message,
+    label: String,
     file: String,
     function: String,
     line: UInt,
@@ -59,6 +63,7 @@ struct Message: CustomStringConvertible {
     box = MessageBox(
       level: level,
       message: message,
+      label: label,
       file: file,
       function: function,
       line: line,
@@ -71,6 +76,7 @@ struct Message: CustomStringConvertible {
   var function: String { box.function }
   var line: UInt { box.line }
   var message: String { box.message }
+  var label: String { box.label }
 
   var compactLogEventFormat: [UInt8] {
     let encoder = JSONEncoder()
@@ -81,13 +87,14 @@ struct Message: CustomStringConvertible {
       "function": function,
       "line": "\(line)",
       "file": file,
+      "label": label,
     ]
-    var buff = try! encoder.encode(msg)
+    let buff = try! encoder.encode(msg)
 
     // Append a carriagereturn + newline 
-    buff.append(0x0D)
-    buff.append(0x0A)
-    return Array(buff)
+//    buff.append(0x0D)
+//    buff.append(0x0A)
+    return Array(buff) + [0x0D, 0x0A]
   }
 
   var description: String {

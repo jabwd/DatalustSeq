@@ -4,26 +4,34 @@
 import PackageDescription
 
 let package = Package(
-  name: "datalustseq",
+  name: "serilog",
   platforms: [
     .macOS(.v10_15)
   ],
   products: [
-    .library(name: "DatalustSeq", targets: ["DatalustSeq"]),
+    .library(name: "Serilog", targets: ["Serilog"]),
+    .executable(name: "Testclient", targets: ["Testclient"])
   ],
   dependencies: [
-    .package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
     .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.2.0"),
+    .package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
+    .package(name: "vapor", url: "https://github.com/vapor/vapor", from: "4.0.0"),
   ],
   targets: [
     .target(
-      name: "DatalustSeq",
+      name: "Serilog",
       dependencies: [
         .product(name: "Logging", package: "swift-log"),
         .product(name: "AsyncHTTPClient", package: "async-http-client"),
       ]),
+    .target(
+      name: "Testclient",
+      dependencies: [
+        .product(name: "Vapor", package: "vapor"),
+        "Serilog"
+    ]),
     .testTarget(
       name: "DatalustSeqTests",
-      dependencies: ["DatalustSeq"]),
+      dependencies: ["Serilog"]),
   ]
 )
