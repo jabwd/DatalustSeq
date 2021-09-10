@@ -37,7 +37,7 @@ public class SeqProvider {
     let eventLoop = eventLoopGroup.next()
     self.eventLoop = eventLoop
 
-    eventLoop.scheduleRepeatedAsyncTask(initialDelay: .seconds(1), delay: .seconds(1), notifying: nil) { [weak self] repeatedTask in
+    eventLoop.scheduleRepeatedAsyncTask(initialDelay: .seconds(1), delay: .seconds(2), notifying: nil) { [weak self] repeatedTask in
       guard let self = self else {
         let promise = eventLoop.makePromise(of: Void.self)
         repeatedTask.cancel(promise: promise)
@@ -56,7 +56,7 @@ public class SeqProvider {
   // MARK: -
 
   func add(message: Message) {
-    self.messages.append(message)
+    messages.append(message)
   }
 
   private func log() {
@@ -104,7 +104,13 @@ public struct Seq: LogHandler {
                   file: String,
                   function: String,
                   line: UInt) {
-    let msg = Message(level: level, message: message, label: label, file: file, function: function, line: line, metadata: metadata)
+    var finalMetadata: Logger.Metadata = _metadata
+    if let metadata = metadata {
+      finalMetadata.merge(metadata) { (lh, rh) in
+        return "\(lh), \(rh)"
+      }
+    }
+    let msg = Message(level: level, message: message, label: label, file: file, function: function, line: line, metadata: finalMetadata)
     provider.eventLoop.execute {
       provider.add(message: msg)
     }
@@ -114,20 +120,17 @@ public struct Seq: LogHandler {
 
   public subscript(metadataKey key: String) -> Logger.Metadata.Value? {
     get {
-      // do nothing
-      print("Get metadat: \(key)")
-      return nil
+      return _metadata[key]
     }
     set(newValue) {
-      // do nothing
-      print("Set metadat: key:\(String(describing: newValue))")
+      _metadata[key] = newValue
     }
   }
 
-  var _metadata: Logger.Metadata? = nil
+  var _metadata: Logger.Metadata = [:]
   public var metadata: Logger.Metadata {
     get {
-      return _metadata!
+      return _metadata
     }
     set {
       _metadata = newValue

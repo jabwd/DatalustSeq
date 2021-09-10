@@ -1,6 +1,6 @@
 import Vapor
 import AsyncHTTPClient
-import DatalustSeq
+import Serilog
 
 var env = try Environment.detect()
 let provider = SeqProvider()
@@ -24,6 +24,6 @@ app.routes.get("") { request -> HTTPStatus in
   return .ok
 }
 
-app.logger.info("Launching vod, version 0.1.0")
+app.logger.info("Launching logging test client")
 try app.run()
 

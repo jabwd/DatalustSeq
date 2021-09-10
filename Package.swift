@@ -13,8 +13,8 @@ let package = Package(
     .executable(name: "Testclient", targets: ["Testclient"])
   ],
   dependencies: [
-    .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.2.0"),
-    .package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
+    .package(name: "async-http-client", url: "https://github.com/swift-server/async-http-client.git", from: "1.2.0"),
+    .package(name: "swift-log", url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
     .package(name: "vapor", url: "https://github.com/vapor/vapor", from: "4.0.0"),
   ],
   targets: [

@@ -80,7 +80,7 @@ struct Message: CustomStringConvertible {
 
   var compactLogEventFormat: [UInt8] {
     let encoder = JSONEncoder()
-    let msg: [String: String] = [
+    var msg: [String: String] = [
       "@t": "\(Self.dateFormatter.string(from: Date()))",
       "@l": "\(level.rawValue)",
       "@mt": "\(message), {function}:{line} in {file}",
@@ -89,11 +89,15 @@ struct Message: CustomStringConvertible {
       "file": file,
       "label": label,
     ]
+    if let metadata = box.metadata {
+      for (_, keyValue) in metadata.enumerated() {
+        msg[keyValue.key] = keyValue.value
+      }
+    }
+
     let buff = try! encoder.encode(msg)
 
     // Append a carriagereturn + newline 
-//    buff.append(0x0D)
-//    buff.append(0x0A)
     return Array(buff) + [0x0D, 0x0A]
   }
 
