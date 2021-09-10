@@ -16,7 +16,6 @@ defer { app.shutdown() }
 
 let seqIngestURL = URL(string: Environment.get("SEQ_API_URL")!)!
 let seqCfg = SeqConfiguration(key: Environment.get("SEQ_API_KEY")!, ingestURL: seqIngestURL)
-// = SeqProvider(configuration: seqCfg, eventLoopGroup: app.eventLoopGroup)
 provider.eventLoopGroup = app.eventLoopGroup
 provider.configuration = seqCfg
 provider.startLogging()
