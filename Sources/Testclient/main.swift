@@ -4,7 +4,12 @@ import Serilog
 
 var env = try Environment.detect()
 let provider = SeqProvider()
-LoggingSystem.bootstrap(provider.createNew)
+let loggerMetadata: Logger.Metadata = [
+  "Application": "Serilog test client"
+]
+LoggingSystem.bootstrap { label in
+  provider.createNew(label: label, metadata: loggerMetadata)
+}
 
 let app = Application(env)
 defer { app.shutdown() }

@@ -26,8 +26,7 @@ public class SeqProvider {
 
   private var messages: [Message] = []
 
-  public init() {
-  }
+  public init() {}
 
   public func startLogging() {
     guard let eventLoopGroup = eventLoopGroup else {
@@ -49,8 +48,8 @@ public class SeqProvider {
     }
   }
 
-  public func createNew(label: String) -> LogHandler {
-    return Seq(label: label, provider: self)
+  public func createNew(label: String, metadata: Logger.Metadata? = nil) -> LogHandler {
+    return Seq(label: label, provider: self, metadata: metadata)
   }
 
   // MARK: -
@@ -91,10 +90,25 @@ public struct Seq: LogHandler {
 
   private let label: String
   private let provider: SeqProvider
+  public var metadata: Logger.Metadata
 
-  public init(label: String, provider: SeqProvider) {
+  public init(label: String, provider: SeqProvider, metadata: Logger.Metadata? = nil) {
     self.label = label
     self.provider = provider
+    if let metadata = metadata {
+      self.metadata = metadata
+    } else {
+      self.metadata = [:]
+    }
+  }
+
+  public subscript(metadataKey key: String) -> Logger.Metadata.Value? {
+    get {
+      return metadata[key]
+    }
+    set(newValue) {
+      metadata[key] = newValue
+    }
   }
 
   public func log(level: Logger.Level,
@@ -113,19 +127,6 @@ public struct Seq: LogHandler {
     let msg = Message(level: level, message: message, label: label, file: file, function: function, line: line, metadata: finalMetadata)
     provider.eventLoop.execute {
       provider.add(message: msg)
-    }
-  }
-
-  // MARK: -
-
-  public var metadata: Logger.Metadata = [:]
-
-  public subscript(metadataKey key: String) -> Logger.Metadata.Value? {
-    get {
-      return metadata[key]
-    }
-    set(newValue) {
-      metadata[key] = newValue
     }
   }
 }
