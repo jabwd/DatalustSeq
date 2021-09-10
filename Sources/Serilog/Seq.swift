@@ -104,7 +104,7 @@ public struct Seq: LogHandler {
                   file: String,
                   function: String,
                   line: UInt) {
-    var finalMetadata: Logger.Metadata = _metadata
+    var finalMetadata: Logger.Metadata = self.metadata
     if let metadata = metadata {
       finalMetadata.merge(metadata) { (lh, rh) in
         return "\(lh), \(rh)"
@@ -118,22 +118,14 @@ public struct Seq: LogHandler {
 
   // MARK: -
 
+  public var metadata: Logger.Metadata = [:]
+
   public subscript(metadataKey key: String) -> Logger.Metadata.Value? {
     get {
-      return _metadata[key]
+      return metadata[key]
     }
     set(newValue) {
-      _metadata[key] = newValue
-    }
-  }
-
-  var _metadata: Logger.Metadata = [:]
-  public var metadata: Logger.Metadata {
-    get {
-      return _metadata
-    }
-    set {
-      _metadata = newValue
+      metadata[key] = newValue
     }
   }
 }
